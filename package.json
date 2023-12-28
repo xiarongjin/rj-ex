@@ -3,12 +3,15 @@
   "displayName": "rj-ex",
   "description": "",
   "version": "0.0.1",
+  "author": "webxrj",
+  "publisher": "1webXRJ",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
+  "repository": "https://github.com/xiarongjin/rj-ex.git",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
