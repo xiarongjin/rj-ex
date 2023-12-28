@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    #submit {
+      background: #3376cd;
+      color: white;
+      text-align: center;
+      width: 80vw;
+      margin: auto;
+      margin-top: 10px;
+      display: block;
+      padding: 8px;
+    }
+
+    input {
+      width: 80vw;
+      padding: 8px;
+      margin: 5px auto 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>模版地址：</div>
+  <input id="preset-repo" placeholder="默认为 preset-app" type="text">
+  <div>新项目地址：</div>
+  <input id="new-repo" placeholder="不填的话需手动关联" type="text">
+  <div>新项目名称：</div>
+  <input id="repo-name" type="text" placeholder="默认为 preset-app">
+  <div>
+    <button id="submit">Submit</button>
+  </div>
+
+
+  <script src="${scriptSrc}"></script>
+</body>
+
+</html>
