@@ -86,11 +86,14 @@ class SidebarInputProvider {
     async getWebviewContent() {
         const scriptUri = vscode.Uri.file(vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), 'media', 'script.js').fsPath);
         const scriptSrc = this._webviewView?.webview.asWebviewUri(scriptUri);
+        const cssUri = vscode.Uri.file(vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), 'media', 'index.css').fsPath);
+        const cssSrc = this._webviewView?.webview.asWebviewUri(cssUri);
         const content = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), 'media', 'index.html'));
-        let fileContent = Buffer.from(content)
+        const addJs = Buffer.from(content)
             .toString('utf-8')
             .replace('<script></script>', `<script src="${scriptSrc}"></script>`);
-        return fileContent;
+        const addCss = addJs.replace('<styleFile></styleFile>', `<link rel="stylesheet" type="text/css" href="${cssSrc}">`);
+        return addCss;
     }
 }
 exports.SidebarInputProvider = SidebarInputProvider;

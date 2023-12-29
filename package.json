@@ -5,7 +5,7 @@
   "version": "0.0.2",
   "author": "webxrj",
   "publisher": "1webXRJ",
-  "icon": "./icon.png",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },

@@ -1,0 +1,17 @@
+#submit {
+  background: #3376cd;
+  color: white;
+  text-align: center;
+  width: 80vw;
+  margin: auto;
+  margin-top: 10px;
+  padding: 8px;
+  border: none;
+  border-radius: 2px;
+}
+
+input {
+  width: 80vw;
+  padding: 8px;
+  margin: 5px auto 10px;
+}
