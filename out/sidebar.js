@@ -25,78 +25,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SidebarInputProvider = void 0;
 const vscode = __importStar(require("vscode"));
-const child_process_1 = require("child_process");
-function executeShellFile(extensionPath) {
-    const shellFilePath = vscode.Uri.joinPath(vscode.Uri.file(extensionPath), 'media', 'preset.sh').fsPath;
-    (0, child_process_1.exec)(`chmod +x ${shellFilePath}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error setting permissions for shell file: ${shellFilePath}`);
-            return;
-        }
-        (0, child_process_1.exec)(shellFilePath + '', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error executing shell file: ${shellFilePath}`);
-                return;
-            }
-            console.log(`Output: ${stdout}`);
-        });
-    });
-}
-function executeShellCommand(command, cwd) {
-    return new Promise((resolve, reject) => {
-        const childProcess = (0, child_process_1.exec)(command, { cwd: cwd });
-        // 监听标准输出数据事件
-        childProcess.stdout?.on('data', (data) => {
-            const output = data.toString();
-            // 处理输出信息
-            console.log(output);
-            showInfo(output);
-        });
-        // 监听标准错误输出数据事件
-        childProcess.stderr?.on('data', (data) => {
-            const errorOutput = data.toString();
-            // 处理错误信息
-            console.error(errorOutput);
-            showInfo(errorOutput);
-        });
-        // 监听子进程的关闭事件
-        childProcess.on('close', (code) => {
-            if (code === 0) {
-                resolve(code);
-            }
-            else {
-                reject(new Error(`Command execution failed with code ${code}`));
-            }
-        });
-    });
-}
+const utils_1 = require("./utils");
 function pullGitRepository(repoUrl, currentDirectory) {
-    return executeShellCommand(`git clone ${repoUrl} ${currentDirectory}`);
-}
-function showInfo(info, delay) {
-    const infoMessage = vscode.window.setStatusBarMessage(`${info}`);
-    if (delay && delay > 0) {
-        setTimeout(() => {
-            infoMessage.dispose(); // 隐藏信息消息
-        }, delay);
-    }
-}
-function getCurrentDirectory() {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders && workspaceFolders.length > 0) {
-        // 获取第一个工作区的根路径
-        const workspaceFolder = workspaceFolders[0];
-        return workspaceFolder.uri.fsPath;
-    }
-    // 如果没有打开的工作区，则返回活动编辑器中打开的文件的所在目录
-    const activeTextEditor = vscode.window.activeTextEditor;
-    if (activeTextEditor) {
-        const activeFilePath = activeTextEditor.document.uri.fsPath;
-        return (vscode.workspace.getWorkspaceFolder(activeTextEditor.document.uri)?.uri
-            .fsPath ?? activeFilePath);
-    }
-    // 如果都没找到，则返回默认的工作目录（通常是插件所在的目录）
-    return __dirname;
+    return (0, utils_1.executeShellCommand)(`git clone ${repoUrl} ${currentDirectory}`);
 }
 class SidebarInputProvider {
     _webviewView;
@@ -120,75 +51,46 @@ class SidebarInputProvider {
                     console.log(data);
                     const repoUrl = data.preset;
                     const repoName = data.name;
-                    const currentDirectory = getCurrentDirectory() + '/' + repoName;
-                    // console.log(currentDirectory)
-                    pullGitRepository(repoUrl, currentDirectory).then(() => {
-                        console.log('clone finish');
-                        showInfo('clone finish');
-                        executeShellCommand(`rm -rf ${currentDirectory}/.git`).then(() => {
-                            // showInfo("rm .git",500);
-                            if (data.new) {
-                                showInfo('正在初始化仓库～');
-                                executeShellCommand(`git init && git add . && git commit -m "first commit" && git branch -M master`, currentDirectory).then(() => {
-                                    showInfo('正在与新仓库关联～');
-                                    executeShellCommand(`git remote add origin ${data.new} && git push -u origin master`, currentDirectory).then(() => {
-                                        showInfo('关联并推送成功！');
+                    const currentDirectory = (0, utils_1.getCurrentDirectory)() + '/' + repoName;
+                    try {
+                        pullGitRepository(repoUrl, currentDirectory).then(() => {
+                            console.log('clone finish');
+                            (0, utils_1.showInfo)('clone finish');
+                            (0, utils_1.executeShellCommand)(`rm -rf ${currentDirectory}/.git`).then(() => {
+                                // showInfo("rm .git",500);
+                                if (data.new) {
+                                    (0, utils_1.showInfo)('正在初始化仓库～');
+                                    (0, utils_1.executeShellCommand)(`git init && git add . && git commit -m "first commit" && git branch -M master`, currentDirectory).then(() => {
+                                        (0, utils_1.showInfo)('正在与新仓库关联～');
+                                        (0, utils_1.executeShellCommand)(`git remote add origin ${data.new} && git push -u origin master`, currentDirectory).then(() => {
+                                            (0, utils_1.showInfo)('关联并推送成功！');
+                                        });
                                     });
-                                });
-                            }
+                                }
+                            });
                         });
-                    });
-                    // executeShellFile(this._extensionPath);
-                    // Handle the input data logic
+                    }
+                    catch (error) {
+                        (0, utils_1.alertInfo)(error + '');
+                    }
                     break;
             }
         });
         this.updateWebview();
     }
-    updateWebview() {
+    async updateWebview() {
         if (this._webviewView) {
-            this._webviewView.webview.html = this.getWebviewContent();
+            this._webviewView.webview.html = await this.getWebviewContent();
         }
     }
-    getWebviewContent() {
+    async getWebviewContent() {
         const scriptUri = vscode.Uri.file(vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), 'media', 'script.js').fsPath);
         const scriptSrc = this._webviewView?.webview.asWebviewUri(scriptUri);
-        return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Document</title>
-          <style>
-            #submit {
-              background: #3376cd;
-              color: white;
-              text-align: center;
-              width:80vw;
-              margin: auto;
-              margin-top: 10px;
-              padding: 8px;
-            }
-            input{
-              width: 80vw;
-              padding: 8px;
-              margin: 5px auto 10px;
-            }
-          </style>
-        </head>
-        <body>
-          <div>模版地址：</div>
-          <input id="preset-repo" placeholder="默认为 preset-app" type="text">
-          <div>新项目地址：</div>
-          <input id="new-repo" placeholder="不填的话需手动关联" type="text">
-          <div>新项目名称：</div>
-          <input id="repo-name" type="text" placeholder="默认为 preset-app">
-          <button id="submit">Submit</button>
-          <script src="${scriptSrc}"></script>
-        </body>
-        </html>
-    `;
+        const content = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), 'media', 'index.html'));
+        let fileContent = Buffer.from(content)
+            .toString('utf-8')
+            .replace('<script></script>', `<script src="${scriptSrc}"></script>`);
+        return fileContent;
     }
 }
 exports.SidebarInputProvider = SidebarInputProvider;

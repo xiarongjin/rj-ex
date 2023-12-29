@@ -38,14 +38,6 @@ class MyTreeDataProvider {
         return element; // 返回一个树节点
     }
     getChildren(element) {
-        // 返回相应节点的子节点数组
-        // if (!element) {
-        //   // 根节点的子节点
-        //   return [new TreeItem('Node 1'), new TreeItem('Node 2')]
-        // } else if (element.label === 'Node 1') {
-        //   // Node 1 的子节点
-        //   return [new TreeItem('Child 1'), new TreeItem('Child 2')]
-        // }
         return [new vscode_1.TreeItem('Child 1'), new vscode_1.TreeItem('Child 2')]; // 其他节点暂无子节点
     }
 }

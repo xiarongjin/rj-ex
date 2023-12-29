@@ -2,9 +2,10 @@
   "name": "rj-ex",
   "displayName": "rj-ex",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "webxrj",
   "publisher": "1webXRJ",
+  "icon": "./icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
