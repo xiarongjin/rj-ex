@@ -1,7 +1,7 @@
 {
-  "name": "rj-ex",
-  "displayName": "rj-ex",
-  "description": "",
+  "name": "create-zn-template",
+  "displayName": "create zn template",
+  "description": "一键拉取模版并关联远程仓库，让新建项目变得简单",
   "version": "0.0.2",
   "author": "webxrj",
   "publisher": "1webXRJ",
@@ -20,7 +20,7 @@
       "activitybar": [
         {
           "id": "package-explorer",
-          "title": "rj-ex",
+          "title": "create zn template",
           "icon": "./icon.svg"
         }
       ]
@@ -38,13 +38,7 @@
           "name": "other"
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "rj-ex.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",

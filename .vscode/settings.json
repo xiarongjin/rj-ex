@@ -7,15 +7,15 @@
     "out": true // set this to false to include "out" folder in search results
   },
   // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-  "typescript.tsc.autoDetect": "off",
-  "saveAndRun": {
-    "commands": [
-      {
-        "match": ".*",
-        "cmd": "echo 'I run for all files.'",
-        "useShortcut": false,
-        "silent": false
-      }
-    ]
-  }
+  "typescript.tsc.autoDetect": "off"
+  // "saveAndRun": {
+  //   "commands": [
+  //     {
+  //       "match": ".*",
+  //       "cmd": "workbench.action.debug.start",
+  //       "useShortcut": false,
+  //       "silent": false
+  //     }
+  //   ]
+  // }
 }
