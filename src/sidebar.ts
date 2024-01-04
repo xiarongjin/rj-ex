@@ -18,7 +18,6 @@ export class SidebarInputProvider implements vscode.WebviewViewProvider {
   constructor(extensionPath: string) {
     this._extensionPath = extensionPath
   }
-
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext<any>,
