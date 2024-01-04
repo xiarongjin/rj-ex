@@ -40,15 +40,13 @@ function activate(context) {
     const sidebarInputProvider = new sidebar_1.SidebarInputProvider(context.extensionPath);
     const reactView = new reactview_1.ReactViewProvider(context.extensionPath);
     const protocol = 'ws';
-    const hostAndPath = 'localhost:3000';
-    const socket = new ws_1.default(`${protocol}://${hostAndPath}`);
+    const hostAndPath = 'localhost:3000/';
+    const socket = new ws_1.default(`${protocol}://${hostAndPath}`, 'vite-hmr');
     let count = 0;
     socket.addEventListener('message', async ({ data }) => {
         count++;
         (0, utils_1.showInfo)('socket' + count);
-        setTimeout(() => {
-            reactView.updateWebview();
-        }, 500);
+        reactView.updateWebview();
     });
     context.subscriptions.push(vscode.window.registerWebviewViewProvider('other', reactView), vscode.window.registerWebviewViewProvider('sidebarInput', sidebarInputProvider));
 }
