@@ -131,44 +131,46 @@ class MP4File extends vscode.TreeItem {
 
 export function openMP4File(extensionPath: string, mp4Path: string) {
   output(mp4Path)
-  executeShellCommand(`sh ${extensionPath}/src/info.sh ${mp4Path}`).then(() => {
-    // console.log('执行完毕')
-    vscode.window
-      .showInputBox({
-        prompt: '请输入转码后视频的宽度',
-        placeHolder: '例如 640 720 1920 等',
-      })
-      .then((width) => {
-        if (width) {
-          output(`输入的宽度是：${width}`)
-        } else {
-          output(`需要输入一个宽度`)
-          return
-        }
-        vscode.window
-          .showInputBox({
-            prompt: '请输入其他视频转码参数',
-            placeHolder: '-crf 20',
-          })
-          .then((input) => {
-            if (input) {
-              output(`输入的其他参数是：${input}`)
-            }
-            output('正在准备中...')
-            showInfo('正在准备中...')
-            executeShellCommand(
-              `sh ${extensionPath}/src/convert.sh ${mp4Path} ${
-                width ? '-w ' + width : ''
-              } ${input}`,
-            ).then(() => {
-              output('已完成转码!请到视频原目录查看')
-              showInfo('已完成转码!请到视频原目录查看')
-              vscode.commands.executeCommand('extension.refreshTreeView')
-              // this.refresh()
+  executeShellCommand(`sh ${extensionPath}/media/info.sh ${mp4Path}`).then(
+    () => {
+      // console.log('执行完毕')
+      vscode.window
+        .showInputBox({
+          prompt: '请输入转码后视频的宽度',
+          placeHolder: '例如 640 720 1920 等',
+        })
+        .then((width) => {
+          if (width) {
+            output(`输入的宽度是：${width}`)
+          } else {
+            output(`需要输入一个宽度`)
+            return
+          }
+          vscode.window
+            .showInputBox({
+              prompt: '请输入其他视频转码参数',
+              placeHolder: '-crf 20',
             })
-          })
-      })
-  })
+            .then((input) => {
+              if (input) {
+                output(`输入的其他参数是：${input}`)
+              }
+              output('正在准备中...')
+              showInfo('正在准备中...')
+              executeShellCommand(
+                `sh ${extensionPath}/media/convert.sh ${mp4Path} ${
+                  width ? '-w ' + width : ''
+                } ${input}`,
+              ).then(() => {
+                output('已完成转码!请到视频原目录查看')
+                showInfo('已完成转码!请到视频原目录查看')
+                vscode.commands.executeCommand('extension.refreshTreeView')
+                // this.refresh()
+              })
+            })
+        })
+    },
+  )
 
   // console.log(extensionPath, mp4Path)
 
