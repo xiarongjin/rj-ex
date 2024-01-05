@@ -2,7 +2,7 @@
   "name": "create-zn-template",
   "displayName": "create zn template",
   "description": "一键拉取模版并关联远程仓库，让新建项目变得简单",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "webxrj",
   "publisher": "1webXRJ",
   "icon": "icon.png",

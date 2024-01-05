@@ -22,3 +22,13 @@ v0.0.2
 v0.0.3
 
 更新插件名称
+
+增加了 auto video 功能
+
+auto video 目前支持 mp4,mov,m4v 格式视频资源转换成 zn 可用的 flv 文件
+
+auto video 支持将 mov,m4v 格式视频转换成 mp4 格式
+
+auto video 借助使用 ffmpeg、ffprobe 指令
+
+请提前备好或者 brew install ffmpeg 安装改指令

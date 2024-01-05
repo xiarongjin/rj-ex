@@ -12,9 +12,7 @@ export function showInfo(info: string, delay?: number) {
 export function alertInfo(info: string) {
   vscode.window.showInformationMessage(info)
 }
-
 const outputChannel = vscode.window.createOutputChannel('create zn template')
-
 export function output(str: string) {
   outputChannel.appendLine(str)
 }
@@ -77,7 +75,7 @@ export function getCurrentDirectory() {
 }
 
 export const getMP4Files = async () => {
-  const filePattern = '**/*.{mp4,mov,m4v}'
+  const filePattern = '**/*.{mp4,mov,m4v,flv}'
   const files = await vscode.workspace.findFiles(filePattern)
   return files
 }

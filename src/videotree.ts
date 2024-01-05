@@ -1,26 +1,112 @@
 import * as vscode from 'vscode'
-import { executeShellCommand, getMP4Files, output } from './utils'
+import { executeShellCommand, getMP4Files, output, showInfo } from './utils'
 export class MP4FilesTreeDataProvider
-  implements vscode.TreeDataProvider<MP4File>
+  implements vscode.TreeDataProvider<MP4File | FileCategory>
 {
   private _extensionPath: string
+  private _onDidChangeTreeData: vscode.EventEmitter<MP4File | undefined> =
+    new vscode.EventEmitter<MP4File | undefined>()
+  readonly onDidChangeTreeData: vscode.Event<MP4File | undefined> =
+    this._onDidChangeTreeData.event
+  private categories: Map<string, MP4File[]>
 
   constructor(extensionPath: string) {
     this._extensionPath = extensionPath
+    this.categories = new Map<string, MP4File[]>()
   }
-  getTreeItem(element: MP4File): vscode.TreeItem | Thenable<vscode.TreeItem> {
+
+  async refresh() {
+    this.categories = new Map<string, MP4File[]>()
+
+    const files = await getMP4Files()
+    for (const file of files) {
+      const fileExt = getExtension(file.fsPath)
+      if (!this.categories.has(fileExt)) {
+        this.categories.set(fileExt, [])
+      }
+
+      const categoryFiles = this.categories.get(fileExt)
+      if (categoryFiles) {
+        const mp4File = new MP4File(
+          getFileName(file),
+          file.fsPath,
+          this._extensionPath,
+        )
+        categoryFiles.push(mp4File)
+      }
+    }
+
+    this._onDidChangeTreeData.fire(undefined)
+  }
+
+  refreshCreatedFiles(createdFiles: readonly vscode.Uri[]) {
+    this.refresh()
+  }
+
+  refreshDeletedFiles(deletedFiles: readonly vscode.Uri[]) {
+    this.refresh()
+  }
+
+  getTreeItem(
+    element: MP4File | FileCategory,
+  ): vscode.TreeItem | Thenable<vscode.TreeItem> {
+    // console.log(element)
+
     return element
   }
 
-  getChildren(element?: MP4File): vscode.ProviderResult<MP4File[]> {
-    if (element) {
-      return [] // 返回空数组，即叶子节点无子节点
-    }
+  async getChildren(
+    element?: MP4File | FileCategory,
+  ): Promise<(MP4File | FileCategory)[] | null | undefined> {
+    // console.log(element)
+    if (!element) {
+      this.categories = new Map<string, MP4File[]>()
 
-    return getMP4FilesInWorkspace(this._extensionPath)
+      const files = await getMP4Files()
+      for (const file of files) {
+        const fileExt = getExtension(file.fsPath)
+        if (!this.categories.has(fileExt)) {
+          this.categories.set(fileExt, [])
+        }
+
+        const categoryFiles = this.categories.get(fileExt)
+        if (categoryFiles) {
+          const mp4File = new MP4File(
+            getFileName(file),
+            file.fsPath,
+            this._extensionPath,
+          )
+          categoryFiles.push(mp4File)
+        }
+      }
+      const categoryNodes: FileCategory[] = []
+      this.categories.forEach((files, category) => {
+        files = files.sort((a, b) => a.label.localeCompare(b.label))
+        const categoryNode = new FileCategory(category)
+        categoryNode.children = files
+        categoryNodes.push(categoryNode)
+      })
+
+      return categoryNodes.sort((a, b) =>
+        (a.label as string).localeCompare(b.label as string),
+      )
+    } else if (element instanceof FileCategory) {
+      // 返回分类下的文件
+
+      return element.children
+    } else {
+      return [] // 叶子节点无子节点
+    }
   }
 }
 
+class FileCategory extends vscode.TreeItem {
+  public children: MP4File[] = []
+
+  constructor(category: string) {
+    super(category, vscode.TreeItemCollapsibleState.Collapsed)
+  }
+}
 class MP4File extends vscode.TreeItem {
   private _extensionPath: string
   constructor(
@@ -54,28 +140,33 @@ export function openMP4File(extensionPath: string, mp4Path: string) {
       })
       .then((width) => {
         if (width) {
-          // 在这里根据用户输入的值执行相应的操作
-          // vscode.window.showInformationMessage(`你输入的是：${width}`)
           output(`输入的宽度是：${width}`)
-          vscode.window
-            .showInputBox({
-              prompt: '请输入其他视频转码参数',
-              placeHolder: '-crf 20',
-            })
-            .then((input) => {
-              if (input) {
-                output(`输入的其他参数是：${input}`)
-              }
-              output('正在准备中')
-              executeShellCommand(
-                `sh ${extensionPath}/src/convert.sh ${mp4Path} -w ${width} ${input}`,
-              ).then(() => {
-                output('已完成转码!请到视频原目录查看')
-              })
-            })
         } else {
-          // vscode.window.showWarningMessage('未提供有效输入！')
+          output(`需要输入一个宽度`)
+          return
         }
+        vscode.window
+          .showInputBox({
+            prompt: '请输入其他视频转码参数',
+            placeHolder: '-crf 20',
+          })
+          .then((input) => {
+            if (input) {
+              output(`输入的其他参数是：${input}`)
+            }
+            output('正在准备中...')
+            showInfo('正在准备中...')
+            executeShellCommand(
+              `sh ${extensionPath}/src/convert.sh ${mp4Path} ${
+                width ? '-w ' + width : ''
+              } ${input}`,
+            ).then(() => {
+              output('已完成转码!请到视频原目录查看')
+              showInfo('已完成转码!请到视频原目录查看')
+              vscode.commands.executeCommand('extension.refreshTreeView')
+              // this.refresh()
+            })
+          })
       })
   })
 
@@ -86,6 +177,10 @@ export function openMP4File(extensionPath: string, mp4Path: string) {
 function getFileName(uri: vscode.Uri): string {
   const pathSegments = uri.path.split('/')
   return pathSegments[pathSegments.length - 1]
+}
+function getExtension(filePath: string): string {
+  const extStart = filePath.lastIndexOf('.')
+  return filePath.substring(extStart).toLowerCase().replace('.', '')
 }
 async function getMP4FilesInWorkspace(
   extensionPath: string,

@@ -22,6 +22,28 @@ export function activate(context: vscode.ExtensionContext) {
       reactView.updateWebview()
     }, 500)
   })
+  context.subscriptions.push(
+    vscode.commands.registerCommand('extension.refreshTreeView', () => {
+      treeDataProvider.refresh()
+    }),
+  )
+
+  // 监听工作区文件夹变动事件
+  vscode.workspace.onDidChangeWorkspaceFolders(() => {
+    treeDataProvider.refresh()
+  })
+
+  // 监听文件被删除事件
+  vscode.workspace.onDidDeleteFiles((event) => {
+    const deletedFiles = event.files
+    treeDataProvider.refreshDeletedFiles(deletedFiles)
+  })
+
+  // 监听文件被创建事件
+  vscode.workspace.onDidCreateFiles((event) => {
+    const createdFiles = event.files
+    treeDataProvider.refreshCreatedFiles(createdFiles)
+  })
 
   context.subscriptions.push(
     // vscode.window.registerWebviewViewProvider('other', reactView),
