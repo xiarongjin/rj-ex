@@ -13,6 +13,12 @@ export function alertInfo(info: string) {
   vscode.window.showInformationMessage(info)
 }
 
+const outputChannel = vscode.window.createOutputChannel('create zn template')
+
+export function output(str: string) {
+  outputChannel.appendLine(str)
+}
+
 export function executeShellCommand(command: string, cwd?: string) {
   return new Promise((resolve, reject) => {
     const childProcess = exec(command, { cwd: cwd })
@@ -21,21 +27,24 @@ export function executeShellCommand(command: string, cwd?: string) {
     childProcess.stdout?.on('data', (data) => {
       const output = data.toString()
       // 处理输出信息
-      console.log(output)
-      showInfo(output)
+      // console.log(output)
+      // showInfo(output)
+      outputChannel.append(output)
     })
 
     // 监听标准错误输出数据事件
     childProcess.stderr?.on('data', (data) => {
       const errorOutput = data.toString()
       // 处理错误信息
-      console.error(errorOutput)
-      showInfo(errorOutput)
+      // console.error(errorOutput)
+      // showInfo(errorOutput)
+      outputChannel.append(errorOutput)
     })
 
     // 监听子进程的关闭事件
     childProcess.on('close', (code) => {
       if (code === 0) {
+        // outputChannel.show()
         resolve(code)
       } else {
         reject(new Error(`Command execution failed with code ${code}`))
@@ -65,4 +74,10 @@ export function getCurrentDirectory() {
 
   // 如果都没找到，则返回默认的工作目录（通常是插件所在的目录）
   return __dirname
+}
+
+export const getMP4Files = async () => {
+  const filePattern = '**/*.{mp4,mov,m4v}'
+  const files = await vscode.workspace.findFiles(filePattern)
+  return files
 }

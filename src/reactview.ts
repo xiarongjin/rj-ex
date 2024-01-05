@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { getMP4Files } from './utils'
 export class ReactViewProvider implements vscode.WebviewViewProvider {
   private _webviewView: vscode.WebviewView | undefined
   private _extensionPath: string
@@ -21,13 +22,19 @@ export class ReactViewProvider implements vscode.WebviewViewProvider {
 
     // Listen for messages from the webview
     this._webviewView.webview.onDidReceiveMessage((message) => {
-      console.log(message)
-
-      switch (message.command) {
+      switch (message.type) {
         case 'init':
-          const data = message.data
-          console.log(data)
+          getMP4Files().then((files) => {
+            const filesPath = files.map((el) => {
+              return el.path.replace(this._extensionPath, '')
+            })
+            console.log(filesPath)
 
+            this._webviewView?.webview.postMessage({
+              type: 'files',
+              filesPath: filesPath,
+            })
+          })
           break
       }
     })
