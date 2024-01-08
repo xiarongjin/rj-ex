@@ -37,3 +37,7 @@ auto video 借助使用 ffmpeg、ffprobe 指令
 v0.0.4
 
 修复已知 bug
+
+v0.0.5
+
+新增 mp4 格式视频的压缩
