@@ -39,6 +39,10 @@
         {
           "id": "mp4FilesView",
           "name": "auto video"
+        },
+        {
+          "id": "imgFilesView",
+          "name": "mini img"
         }
       ]
     }

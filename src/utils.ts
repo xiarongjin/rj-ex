@@ -79,3 +79,12 @@ export const getMP4Files = async () => {
   const files = await vscode.workspace.findFiles(filePattern)
   return files
 }
+
+export function getFileName(uri: vscode.Uri): string {
+  const pathSegments = uri.path.split('/')
+  return pathSegments[pathSegments.length - 1]
+}
+export function getExtension(filePath: string): string {
+  const extStart = filePath.lastIndexOf('.')
+  return filePath.substring(extStart).toLowerCase().replace('.', '')
+}

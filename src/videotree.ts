@@ -1,5 +1,12 @@
 import * as vscode from 'vscode'
-import { executeShellCommand, getMP4Files, output, showInfo } from './utils'
+import {
+  executeShellCommand,
+  getExtension,
+  getFileName,
+  getMP4Files,
+  output,
+  showInfo,
+} from './utils'
 export class MP4FilesTreeDataProvider
   implements vscode.TreeDataProvider<MP4File | FileCategory>
 {
@@ -16,25 +23,25 @@ export class MP4FilesTreeDataProvider
   }
 
   async refresh() {
-    this.categories = new Map<string, MP4File[]>()
+    // this.categories = new Map<string, MP4File[]>()
 
-    const files = await getMP4Files()
-    for (const file of files) {
-      const fileExt = getExtension(file.fsPath)
-      if (!this.categories.has(fileExt)) {
-        this.categories.set(fileExt, [])
-      }
+    // const files = await getMP4Files()
+    // for (const file of files) {
+    //   const fileExt = getExtension(file.fsPath)
+    //   if (!this.categories.has(fileExt)) {
+    //     this.categories.set(fileExt, [])
+    //   }
 
-      const categoryFiles = this.categories.get(fileExt)
-      if (categoryFiles) {
-        const mp4File = new MP4File(
-          getFileName(file),
-          file.fsPath,
-          this._extensionPath,
-        )
-        categoryFiles.push(mp4File)
-      }
-    }
+    //   const categoryFiles = this.categories.get(fileExt)
+    //   if (categoryFiles) {
+    //     const mp4File = new MP4File(
+    //       getFileName(file),
+    //       file.fsPath,
+    //       this._extensionPath,
+    //     )
+    //     categoryFiles.push(mp4File)
+    //   }
+    // }
 
     this._onDidChangeTreeData.fire(undefined)
   }
@@ -246,29 +253,4 @@ export function openMP4File(extensionPath: string, mp4Path: string) {
   // console.log(extensionPath, mp4Path)
 
   // vscode.window.showInformationMessage(args)
-}
-function getFileName(uri: vscode.Uri): string {
-  const pathSegments = uri.path.split('/')
-  return pathSegments[pathSegments.length - 1]
-}
-function getExtension(filePath: string): string {
-  const extStart = filePath.lastIndexOf('.')
-  return filePath.substring(extStart).toLowerCase().replace('.', '')
-}
-async function getMP4FilesInWorkspace(
-  extensionPath: string,
-): Promise<MP4File[]> {
-  const workspaceFolders = vscode.workspace.workspaceFolders
-  const mp4Files: MP4File[] = []
-
-  if (workspaceFolders) {
-    const files = await getMP4Files()
-
-    for (const file of files) {
-      const mp4File = new MP4File(getFileName(file), file.fsPath, extensionPath)
-      mp4Files.push(mp4File)
-    }
-  }
-
-  return mp4Files
 }
