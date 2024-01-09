@@ -41,3 +41,11 @@ v0.0.4
 v0.0.5
 
 新增 mp4 格式视频的压缩
+
+新增 minify img 面板
+
+minify img 会收集工作区内图片资源
+
+minify img 不会检查这些目录 ['node_modules', '.git', '.cache']
+
+minify img 可以压缩图片，支持图片格式互相转换
