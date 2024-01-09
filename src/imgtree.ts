@@ -75,7 +75,7 @@ export const openImgFile = (path: string) => {
 
 function ignoreFolder(folderName: string): boolean {
   // 在此处定义要忽略的目录名或条件
-  const ignoredFolders = ['node_modules', '.git', '.cache']
+  const ignoredFolders = ['node_modules', '.git', '.cache', 'dist']
   let isIg = false
   ignoredFolders.map((el) => {
     if (folderName.includes(el)) {
@@ -96,8 +96,22 @@ export class ImageDataProvider
   private _extensionPath: string
   constructor(extensionPath: string) {
     this._extensionPath = extensionPath
+    this.setupFileSystemWatcher()
   }
-  refresh(node?: FileTreeNode): void {
+
+  private setupFileSystemWatcher() {
+    const fileWatcher = vscode.workspace.createFileSystemWatcher(
+      '**/*.{jpg,jpeg,png,webp,avif}',
+    )
+    fileWatcher.onDidCreate((uri) => {
+      this.refreshCreatedFiles([uri])
+    })
+    fileWatcher.onDidDelete((uri) => {
+      this.refreshDeletedFiles([uri])
+    })
+  }
+
+  async refresh() {
     this._onDidChangeTreeData.fire(undefined)
   }
 

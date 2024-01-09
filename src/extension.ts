@@ -37,21 +37,13 @@ export function activate(context: vscode.ExtensionContext) {
   )
 
   // 监听工作区文件夹变动事件
-  vscode.workspace.onDidChangeWorkspaceFolders(() => {
-    videoTreeDataProvider.refresh()
-  })
+  vscode.workspace.onDidChangeWorkspaceFolders(() => {})
 
   // 监听文件被删除事件
-  vscode.workspace.onDidDeleteFiles((event) => {
-    const deletedFiles = event.files
-    videoTreeDataProvider.refreshDeletedFiles(deletedFiles)
-  })
+  vscode.workspace.onDidDeleteFiles((event) => {})
 
   // 监听文件被创建事件
-  vscode.workspace.onDidCreateFiles((event) => {
-    const createdFiles = event.files
-    videoTreeDataProvider.refreshCreatedFiles(createdFiles)
-  })
+  vscode.workspace.onDidCreateFiles((event) => {})
 
   context.subscriptions.push(
     // vscode.window.registerWebviewViewProvider('other', reactView),

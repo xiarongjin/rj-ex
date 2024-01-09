@@ -20,6 +20,19 @@ export class MP4FilesTreeDataProvider
   constructor(extensionPath: string) {
     this._extensionPath = extensionPath
     this.categories = new Map<string, MP4File[]>()
+    this.setupFileSystemWatcher()
+  }
+
+  private setupFileSystemWatcher() {
+    const fileWatcher = vscode.workspace.createFileSystemWatcher(
+      '**/*.{mp4,flv,mov,m4v}',
+    )
+    fileWatcher.onDidCreate((uri) => {
+      this.refreshCreatedFiles([uri])
+    })
+    fileWatcher.onDidDelete((uri) => {
+      this.refreshDeletedFiles([uri])
+    })
   }
 
   async refresh() {
@@ -42,7 +55,6 @@ export class MP4FilesTreeDataProvider
     //     categoryFiles.push(mp4File)
     //   }
     // }
-
     this._onDidChangeTreeData.fire(undefined)
   }
 
