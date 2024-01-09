@@ -49,3 +49,5 @@ minify img 会收集工作区内图片资源
 minify img 不会检查这些目录 ['node_modules', '.git', '.cache']
 
 minify img 可以压缩图片，支持图片格式互相转换
+
+\*当前功能可能仅支持在 arm64 环境下
