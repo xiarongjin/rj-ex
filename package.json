@@ -41,6 +41,11 @@
           "name": "auto video"
         },
         {
+          "type": "webview",
+          "id": "mp4FilesWebView",
+          "name": "web auto video"
+        },
+        {
           "id": "imgFilesView",
           "name": "minify img"
         }

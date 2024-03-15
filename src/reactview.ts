@@ -1,11 +1,36 @@
 import * as vscode from 'vscode'
-import { getMP4Files } from './utils'
+import { executeShellCommand, getMP4Files, output, showInfo } from './utils'
+interface filesItems {
+  title?: string
+  key: string
+  url?: string
+  crf?: number
+  width?: number
+  type?: string
+  options?: string
+}
+function* customIterator(arr: filesItems[]) {
+  for (let i = 0; i < arr.length; i++) {
+    yield arr[i]
+  }
+}
 export class ReactViewProvider implements vscode.WebviewViewProvider {
   private _webviewView: vscode.WebviewView | undefined
   private _extensionPath: string
 
   constructor(extensionPath: string) {
     this._extensionPath = extensionPath
+  }
+  public updateFiles() {
+    getMP4Files().then((files) => {
+      const filesPath = files.map((el) => {
+        return el.path.replace(this._extensionPath, '')
+      })
+      this._webviewView?.webview.postMessage({
+        type: 'files',
+        filesPath: filesPath,
+      })
+    })
   }
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -18,24 +43,76 @@ export class ReactViewProvider implements vscode.WebviewViewProvider {
     }
 
     // Set the title of the view
-    this._webviewView.title = 'init repo'
-
+    this._webviewView.title = 'auto video webView'
+    const that = this
     // Listen for messages from the webview
     this._webviewView.webview.onDidReceiveMessage((message) => {
       switch (message.type) {
         case 'init':
-          getMP4Files().then((files) => {
-            const filesPath = files.map((el) => {
-              return el.path.replace(this._extensionPath, '')
-            })
-            console.log(filesPath)
-
-            this._webviewView?.webview.postMessage({
-              type: 'files',
-              filesPath: filesPath,
-            })
-          })
+          this.updateFiles()
           break
+        case 'filesMap':
+          console.log(message, 'test')
+
+          const filesMap = message.filesMap as filesItems[]
+
+          const iterator = customIterator(filesMap)
+
+          function executeNext() {
+            const result = iterator.next()
+            // const filesItem = result.value as filesItems
+
+            // executeShellCommand(
+            //   `sh ${that._extensionPath}/media/convert.sh ${filesItem.key} ${
+            //     filesItem.width ? '-w ' + filesItem.width : ''
+            //   } ${filesItem.crf ? '-crf ' + filesItem.crf : ''} ${
+            //     filesItem.options
+            //   }`,
+            // ).then(() => {
+            //   output('已完成转码!请到视频原目录查看')
+            //   showInfo('已完成转码!请到视频原目录查看')
+            //   // vscode.commands.executeCommand('extension.refreshTreeView')
+            //   that.updateWebview()
+            // })
+            if (!result.done) {
+              console.log('Executing element:', result.value)
+              const filesItem = result.value as filesItems
+              if (filesItem.type === 'flv') {
+                executeShellCommand(
+                  `sh ${that._extensionPath}/media/convert.sh ${
+                    filesItem.key
+                  } ${filesItem.width ? '-w ' + filesItem.width : ''} ${
+                    filesItem.crf ? '-crf ' + filesItem.crf : ''
+                  } ${filesItem.options}`,
+                ).then(() => {
+                  output('已完成转码!请到视频原目录查看')
+                  showInfo('已完成转码!请到视频原目录查看')
+                  // vscode.commands.executeCommand('extension.refreshTreeView')
+                  that.updateFiles()
+                  executeNext()
+                })
+              } else {
+                executeShellCommand(
+                  `sh ${that._extensionPath}/media/convert.sh ${
+                    filesItem.key
+                  } ${filesItem.width ? '-w ' + filesItem.width : ''} ${
+                    filesItem.crf ? '-crf ' + filesItem.crf : ''
+                  } ${filesItem.options} -fmt mp4`,
+                ).then(() => {
+                  output('已完成转码!请到视频原目录查看')
+                  showInfo('已完成转码!请到视频原目录查看')
+                  // vscode.commands.executeCommand('extension.refreshTreeView')
+                  that.updateFiles()
+                  executeNext()
+                })
+              }
+
+              // setTimeout(executeNext, 1000) // 模拟延迟执行
+            } else {
+              console.log('Iteration completed.')
+            }
+          }
+          executeNext()
       }
     })
 

@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import { SidebarInputProvider } from './sidebar'
 // import WebSocket from 'ws'
 // import { showInfo } from './utils'
-// import { ReactViewProvider } from './reactview'
+import { ReactViewProvider } from './reactview'
 import { MP4FilesTreeDataProvider, openMP4File } from './videotree'
 import { ImageDataProvider, openImgFile } from './imgtree'
 // This method is called when your extension is activated
@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 开发环境下热更新，生产环境中需去除
 
-  // const reactView = new ReactViewProvider(context.extensionPath)
+  const reactView = new ReactViewProvider(context.extensionPath)
   // const protocol = 'ws'
   // const hostAndPath = 'localhost:3000'
   // const socket = new WebSocket(`${protocol}://${hostAndPath}`)
@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidCreateFiles((event) => {})
 
   context.subscriptions.push(
-    // vscode.window.registerWebviewViewProvider('other', reactView),
+    vscode.window.registerWebviewViewProvider('mp4FilesWebView', reactView),
     vscode.window.registerWebviewViewProvider(
       'sidebarInput',
       sidebarInputProvider,
