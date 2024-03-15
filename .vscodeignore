@@ -9,6 +9,8 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+react-view/node_modules
+react-view/*
 react-view/src
-react-view
+!/dist
 out/test
