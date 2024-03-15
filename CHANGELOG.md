@@ -43,3 +43,9 @@ minify img 不会检查这些目录 ['node_modules', '.git', '.cache']
 minify img 可以压缩图片，支持图片格式互相转换
 
 \*当前功能可能仅支持在 arm64 环境下
+
+v0.1.0
+
+新增 auto video webView 面板
+
+支持多选、支持文件名复制
