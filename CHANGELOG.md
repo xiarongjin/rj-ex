@@ -49,3 +49,9 @@ v0.1.0
 新增 auto video webView 面板
 
 支持多选、支持文件名复制
+
+v0.1.1
+
+auto video webView 面板
+
+新增关键词搜索功能
