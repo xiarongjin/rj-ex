@@ -15,7 +15,7 @@ interface MsgData {
   filesMap?: filesItems[]
 }
 export const postMsg = (data: MsgData) => {
-  // vscodeApi.postMessage(data)
+  vscodeApi.postMessage(data)
   console.log(data)
 }
 

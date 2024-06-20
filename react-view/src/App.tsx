@@ -100,7 +100,7 @@ const App: React.FC = () => {
       setTreeDataView(treeDataStatic)
     }
   }, [searchKey, treeData])
-  const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+  const onSearch: SearchProps['onSearch'] = (value) => {
     setSearchKey(value)
   }
 
@@ -110,7 +110,7 @@ const App: React.FC = () => {
       <Search
         placeholder="input search text"
         onSearch={onSearch}
-        style={{ width: 200 }}
+        style={{ width: 200, marginBottom: '10px' }}
       />
       <DirectoryTree
         multiple
