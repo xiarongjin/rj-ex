@@ -29,7 +29,7 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
   window.addEventListener(
     'message',
     (event) => {
-      console.log('Received message: ', event.data)
+      // console.log('Received message: ', event.data)
       // console.log(filesArr)
       switch (event.data.type) {
         case 'files':

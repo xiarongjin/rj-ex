@@ -59,7 +59,7 @@
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
-    "view": "cd react-view && yarn build --watch"
+    "view": "cd react-view && yarn && yarn build --watch"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",

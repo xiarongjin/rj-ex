@@ -2,10 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { Modal, Tree, message } from 'antd'
 import type { GetProps, TreeDataNode } from 'antd'
 import './App.css'
-import { getTreeDataMap, postMsg, writeClipboardText } from './utils'
+import {
+  getFilesArr,
+  getTreeDataMap,
+  postMsg,
+  writeClipboardText,
+} from './utils'
 import { CopyOutlined } from '@ant-design/icons'
 import { FileGroup, filesItems } from './components/MyBoard'
 import { useGlobalContext } from './components/GlobalProvider'
+import Search, { SearchProps } from 'antd/es/input/Search'
 
 type DirectoryTreeProps = GetProps<typeof Tree.DirectoryTree>
 
@@ -13,13 +19,17 @@ const { DirectoryTree } = Tree
 // console.log(getTreeDataMap(getFilesArr()))
 postMsg({ type: 'init', text: 'hello vscode' })
 const App: React.FC = () => {
-  const { globalObject } = useGlobalContext()
+  const { globalObject, setGlobalObject } = useGlobalContext()
 
   // console.log(globalObject.filesArr)
   const [treeData, setTreeData] = useState<TreeDataNode[]>([])
+  const [treeDataView, setTreeDataView] = useState<TreeDataNode[]>([])
   // const treeData: TreeDataNode[] = []
   useEffect(() => {
     console.log(globalObject.filesArr, 'tset')
+    if (import.meta.env.DEV) {
+      setGlobalObject({ filesArr: getFilesArr() })
+    }
     if (globalObject.filesArr) {
       const treeDataMap = getTreeDataMap(globalObject.filesArr)
       const treeDataStatic: TreeDataNode[] = []
@@ -75,10 +85,33 @@ const App: React.FC = () => {
   // const onExpand: DirectoryTreeProps['onExpand'] = (keys, info) => {
   // console.log('Trigger Expand', keys, info)
   // }
+  const [searchKey, setSearchKey] = useState<string>('')
+  useEffect(() => {
+    const filterFilesArr = globalObject.filesArr?.filter((el) => {
+      return el.includes(searchKey)
+    })
+
+    if (filterFilesArr) {
+      const treeDataMap = getTreeDataMap(filterFilesArr)
+      const treeDataStatic: TreeDataNode[] = []
+      treeDataMap.forEach((v) => {
+        treeDataStatic.push(v)
+      })
+      setTreeDataView(treeDataStatic)
+    }
+  }, [searchKey, treeData])
+  const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+    setSearchKey(value)
+  }
 
   return (
     <div style={{ minWidth: '600px' }}>
       {contextHolder}
+      <Search
+        placeholder="input search text"
+        onSearch={onSearch}
+        style={{ width: 200 }}
+      />
       <DirectoryTree
         multiple
         defaultExpandAll
@@ -90,7 +123,7 @@ const App: React.FC = () => {
             showModal()
           }
         }}
-        treeData={treeData}
+        treeData={treeDataView}
         titleRender={(node) => (
           <>
             <>{node.title}</>

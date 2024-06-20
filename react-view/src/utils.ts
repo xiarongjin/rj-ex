@@ -1,9 +1,13 @@
 import { TreeDataNode } from 'antd'
 import { filesItems } from './components/MyBoard'
 
-// @ts-expect-error vscode
-const vscodeApi = acquireVsCodeApi()
-// const vscodeApi = window
+let vscodeApi = window
+try {
+  // @ts-expect-error vscode
+  vscodeApi = acquireVsCodeApi()
+} catch (error) {
+  /* empty */
+}
 
 interface MsgData {
   type: 'init' | 'filesMap'
@@ -11,27 +15,27 @@ interface MsgData {
   filesMap?: filesItems[]
 }
 export const postMsg = (data: MsgData) => {
-  vscodeApi.postMessage(data)
+  // vscodeApi.postMessage(data)
   console.log(data)
 }
 
-// let filesArr: string[] = [
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test_320.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/4k-1_944.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test_2500k.mp4',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test.mp4',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/3.m4v',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo.mp4',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/9-16.mov',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo_640.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo_320.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/particle-pc_1920.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/2_640.flv',
-//   // '/Users/xiarongjin/Desktop/upup/extension/test/2.m4v',
-// ]
-// export const getFilesArr = () => {
-//   return filesArr
-// }
+const filesArr: string[] = [
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test_320.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/4k-1_944.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test_2500k.mp4',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/test.mp4',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/3.m4v',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo.mp4',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/9-16.mov',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo_640.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/cn_mo_320.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/src/assets/videos/particle-pc_1920.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/2_640.flv',
+  '/Users/xiarongjin/Desktop/upup/extension/test/2.m4v',
+]
+export const getFilesArr = () => {
+  return filesArr
+}
 export async function writeClipboardText(text: string) {
   try {
     await navigator.clipboard.writeText(text)
